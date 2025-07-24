@@ -1,14 +1,18 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
-const cors = require('cors');
+const cors = require('cors'); // Importa o pacote CORS
 const path = require('path');
 
 const app = express();
 const PORT = 3000;
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // Habilita CORS para todas as requisições. Isso é CRUCIAL para evitar problemas de "Cross-Origin".
+app.use(express.json()); // Habilita o parsing de JSON no corpo das requisições
+
+// Serve arquivos estáticos do frontend.
+// Certifique-se de que o caminho relativo '../frontend' está correto.
+// Se seu server.js está em 'projeto/backend' e seu frontend em 'projeto/frontend', este caminho está certo.
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Configuração do banco de dados SQLite
@@ -24,7 +28,7 @@ const db = new sqlite3.Database('./escola.db', (err) => {
 db.serialize(() => {
     // Tabela de turmas
     db.run(`CREATE TABLE IF NOT EXISTS turmas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL UNIQUE,
         serie TEXT NOT NULL,
         ano INTEGER NOT NULL,
@@ -79,7 +83,7 @@ db.serialize(() => {
     )`);
 });
 
-// Rota principal - servir o HTML
+// Rota principal - servir o HTML (se você acessar http://localhost:3000/)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
@@ -497,7 +501,7 @@ app.delete('/api/alunos/:id', (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => { // O '0.0.0.0' permite que o servidor seja acessível externamente se necessário, mas 'localhost' é mais comum para desenvolvimento local.
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
 
@@ -511,4 +515,3 @@ process.on('SIGINT', () => {
         process.exit(0);
     });
 });
-

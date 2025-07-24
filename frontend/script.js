@@ -1,5 +1,6 @@
 // Configuração da API
-const API_BASE = '';
+// APONTAR PARA O ENDEREÇO ONDE SEU BACKEND ESTÁ RODANDO
+const API_BASE = 'http://localhost:3000'; 
 
 // Estado da aplicação
 let currentTab = 'professores';
@@ -64,7 +65,7 @@ const elements = {
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
-    loadProfessores();
+    switchTab('professores'); // Garante que a aba de professores seja carregada ao iniciar
     setupFormMasks();
 });
 
@@ -139,8 +140,12 @@ function setupFormMasks() {
     document.querySelectorAll('input[type="tel"]').forEach(input => {
         input.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, '');
-            value = value.replace(/(\d{2})(\d)/, '($1) $2');
-            value = value.replace(/(\d{5})(\d)/, '$1-$2');
+            // Formato (XX) XXXXX-XXXX para telefones com 9 dígitos no meio (celular)
+            if (value.length > 10) { 
+                value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } else { // Formato (XX) XXXX-XXXX para telefones fixos ou com 8 dígitos no meio
+                value = value.replace(/^(\d{2})(\d{4})(\d{4}).*/, '($1) $2-$3');
+            }
             e.target.value = value;
         });
     });
@@ -164,7 +169,7 @@ function switchTab(tabName) {
     if (tabName === 'professores') {
         loadProfessores();
     } else if (tabName === 'alunos') {
-        showTurmasView();
+        showTurmasView(); // Garante que a visão de turmas seja a padrão ao entrar na aba Alunos
         loadTurmas();
     }
 }
@@ -183,7 +188,7 @@ function debounce(func, wait) {
 }
 
 function showLoading() {
-    elements.loading.style.display = 'block';
+    elements.loading.style.display = 'flex'; // Usar 'flex' para centralizar o spinner
 }
 
 function hideLoading() {
@@ -204,16 +209,21 @@ function showToast(message, type = 'info') {
 
 function formatDate(dateString) {
     if (!dateString) return '-';
-    const date = new Date(dateString);
+    // Se a data já for 'YYYY-MM-DD', new Date() pode ter problemas de fuso horário.
+    // É melhor parsear manualmente ou garantir que o backend envie um formato ISO completo.
+    // Para simplificar, vou assumir que o backend envia algo que Date() entende ou que é 'YYYY-MM-DD'.
+    const date = new Date(dateString + 'T00:00:00'); // Adiciona T00:00:00 para garantir UTC e evitar problemas de fuso.
     return date.toLocaleDateString('pt-BR');
 }
 
 function formatCPF(cpf) {
     if (!cpf) return '-';
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    // Remove qualquer coisa que não seja dígito e aplica a máscara
+    const cleanCpf = cpf.replace(/\D/g, '');
+    return cleanCpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
-// API Calls
+// API Calls - FUNÇÃO apiCall COM TRATAMENTO DE ERROS MELHORADO
 async function apiCall(endpoint, options = {}) {
     try {
         showLoading();
@@ -225,16 +235,31 @@ async function apiCall(endpoint, options = {}) {
             ...options
         });
         
-        const data = await response.json();
-        
+        // **VERIFICAR A RESPOSTA ANTES DE TENTAR O JSON**
         if (!response.ok) {
-            throw new Error(data.error || 'Erro na requisição');
+            let errorData = {};
+            try {
+                // Tenta ler como JSON para pegar a mensagem de erro do servidor
+                errorData = await response.json();
+            } catch (e) {
+                // Se não for JSON (ex: HTML de erro), lê como texto simples
+                errorData = await response.text();
+            }
+            // Lança um erro com detalhes da resposta para depuração
+            throw new Error(errorData.error || `Erro na requisição: ${response.status} ${response.statusText}. Detalhes: ${JSON.stringify(errorData)}`);
         }
+        
+        // Se a resposta for OK, tenta parsear como JSON
+        const data = await response.json(); 
         
         return data;
     } catch (error) {
+        // Exibe o erro no console para depuração mais detalhada
+        console.error('Erro na chamada da API:', error); 
+        // Mostra uma mensagem amigável ao usuário
         showToast(error.message, 'error');
-        throw error;
+        // Re-lança o erro para que as funções que chamaram apiCall possam tratá-lo se necessário
+        throw error; 
     } finally {
         hideLoading();
     }
@@ -248,6 +273,7 @@ async function loadTurmas() {
         renderTurmas(turmas);
     } catch (error) {
         console.error('Erro ao carregar turmas:', error);
+        // showToast já lida com a exibição, então não precisa repetir aqui
     }
 }
 
@@ -274,7 +300,7 @@ function renderTurmas(turmas) {
             <div class="empty-turmas">
                 <i class="fas fa-school"></i>
                 <h3>Nenhuma turma cadastrada</h3>
-                <p>Crie uma turma ao cadastrar um aluno</p>
+                <p>Crie uma turma ao cadastrar um aluno ou utilize o botão "Nova Turma"</p>
             </div>
         `;
         return;
@@ -375,7 +401,7 @@ async function handleTurmaSubmit(e) {
         
         closeTurmaModal();
         loadTurmas();
-        loadTurmasSelect();
+        loadTurmasSelect(); // Recarrega o select de turmas em todos os modais de aluno abertos
     } catch (error) {
         console.error('Erro ao salvar turma:', error);
     }
@@ -413,6 +439,7 @@ function showTurmasView() {
     elements.turmasView.style.display = 'block';
     elements.alunosView.style.display = 'none';
     currentTurmaId = null;
+    loadTurmas(); // Recarrega as turmas ao voltar para a visão de turmas
 }
 
 function showAlunosView(turmaId = null, turmaNome = null) {
@@ -507,7 +534,12 @@ function openProfessorModal(professor = null) {
         Object.keys(professor).forEach(key => {
             const input = document.querySelector(`#professor-form [name="${key}"]`);
             if (input) {
-                input.value = professor[key] || '';
+                // Formatar datas para o input type="date"
+                if (key.includes('data_nascimento') || key.includes('data_admissao')) {
+                    input.value = professor[key] ? new Date(professor[key]).toISOString().split('T')[0] : '';
+                } else {
+                    input.value = professor[key] || '';
+                }
             }
         });
     }
@@ -648,8 +680,8 @@ async function openAlunoModal(aluno = null) {
     editingId = aluno ? aluno.id : null;
     elements.alunoModalTitle.textContent = aluno ? 'Editar Aluno' : 'Novo Aluno';
     
-    // Carregar turmas no select
-    await loadTurmasSelect();
+    // Carregar turmas no select antes de preencher
+    await loadTurmasSelect(); 
     
     // Limpar formulário
     elements.alunoForm.reset();
@@ -659,7 +691,14 @@ async function openAlunoModal(aluno = null) {
         Object.keys(aluno).forEach(key => {
             const input = document.querySelector(`#aluno-form [name="${key}"]`);
             if (input) {
-                input.value = aluno[key] || '';
+                // Formatar datas para o input type="date"
+                if (key.includes('data_nascimento')) {
+                    input.value = aluno[key] ? new Date(aluno[key]).toISOString().split('T')[0] : '';
+                } else if (key === 'turma_id') { // Selecionar a turma correta no dropdown
+                    elements.alunoTurmaSelect.value = aluno[key] || '';
+                } else {
+                    input.value = aluno[key] || '';
+                }
             }
         });
     } else {
@@ -681,10 +720,8 @@ async function handleAlunoSubmit(e) {
     const formData = new FormData(elements.alunoForm);
     const data = Object.fromEntries(formData.entries());
     
-    // Converter turma_id para null se vazio
-    if (!data.turma_id) {
-        data.turma_id = null;
-    }
+    // Converter turma_id para null se vazio ou indefinido
+    data.turma_id = data.turma_id === '' ? null : parseInt(data.turma_id, 10);
     
     try {
         if (editingId) {
@@ -718,7 +755,7 @@ async function handleAlunoSubmit(e) {
 async function editAluno(id) {
     try {
         const aluno = await apiCall(`/api/alunos/${id}`);
-        openAlunoModal(aluno);
+        await openAlunoModal(aluno); // Aguardar o modal abrir e carregar turmas antes de preencher
     } catch (error) {
         console.error('Erro ao carregar aluno:', error);
     }
@@ -760,4 +797,3 @@ function executeDelete() {
         closeConfirmModal();
     }
 }
-

@@ -9,13 +9,11 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
             <h1><i class="fas fa-graduation-cap"></i> Sistema de Gestão Escolar</h1>
             <p>Painel do Diretor</p>
         </header>
 
-        <!-- Navigation Tabs -->
         <nav class="tabs">
             <button class="tab-button active" data-tab="professores">
                 <i class="fas fa-chalkboard-teacher"></i> Professores
@@ -25,7 +23,6 @@
             </button>
         </nav>
 
-        <!-- Professores Tab -->
         <div id="professores" class="tab-content active">
             <div class="content-header">
                 <h2>Gestão de Professores</h2>
@@ -52,13 +49,11 @@
                         </tr>
                     </thead>
                     <tbody id="professores-tbody">
-                        <!-- Dados serão carregados dinamicamente -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Alunos Tab -->
         <div id="alunos" class="tab-content">
             <div class="content-header">
                 <h2>Gestão de Alunos</h2>
@@ -71,7 +66,6 @@
                 </button>
             </div>
 
-            <!-- Visualização por Turmas -->
             <div id="turmas-view" class="turmas-view">
                 <div class="view-header">
                     <h3>Turmas Cadastradas</h3>
@@ -80,11 +74,9 @@
                     </button>
                 </div>
                 <div id="turmas-grid" class="turmas-grid">
-                    <!-- Turmas serão carregadas dinamicamente -->
-                </div>
+                    </div>
             </div>
 
-            <!-- Visualização de Alunos -->
             <div id="alunos-view" class="alunos-view" style="display: none;">
                 <div class="view-header">
                     <h3 id="alunos-view-title">Todos os Alunos</h3>
@@ -105,15 +97,13 @@
                             </tr>
                         </thead>
                         <tbody id="alunos-tbody">
-                            <!-- Dados serão carregados dinamicamente -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para Professores -->
     <div id="professor-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -261,7 +251,6 @@
         </div>
     </div>
 
-    <!-- Modal para Alunos -->
     <div id="aluno-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -418,7 +407,6 @@
         </div>
     </div>
 
-    <!-- Modal para Nova Turma -->
     <div id="turma-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -462,7 +450,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmação -->
     <div id="confirm-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -479,28 +466,12 @@
         </div>
     </div>
 
-    <!-- Loading Spinner -->
     <div id="loading" class="loading">
         <div class="spinner"></div>
     </div>
 
-    <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
-    <!-- Loading Overlay -->
-    <div id="loading">
-        <div class="loading-spinner"></div>
-    </div>
-
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
-
-    <script src="script.js"></script>
-</body>
-</html>
-
