@@ -1,38 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.querySelector('.login-form');
+    const toastContainer = document.getElementById('toast-container');
+
+    function showToast(message, type = 'error') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        if(toastContainer) toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
 
     if (loginForm) {
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Impede o envio padrão do formulário
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, senha: password })
+                });
 
-            const username = usernameInput.value; // Pode ser e-mail ou o nome de usuário
-            const password = passwordInput.value;
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
 
-            // Recupera as credenciais do usuário registrado do localStorage
-            const storedUser = localStorage.getItem('registeredUser');
-            let authenticated = false;
-
-            if (storedUser) {
-                const user = JSON.parse(storedUser);
-                // Verifica se o username/email OU o nome E a senha correspondem
-                if ((username === user.email || username === user.name) && password === user.password) {
-                    authenticated = true;
-                }
-            } else {
-                // Fallback para credenciais hardcoded se nenhum usuário estiver registrado
-                if (username === 'admin' && password === 'admin123') {
-                    authenticated = true;
-                }
-            }
-
-            if (authenticated) {
-                alert('Login bem-sucedido! Redirecionando para o painel.');
-                window.location.href = 'index.html'; // Redireciona para a página principal da aplicação
-            } else {
-                alert('Credenciais inválidas. Verifique seu e-mail/usuário e senha.');
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                window.location.href = 'index.html';
+            } catch (error) {
+                showToast(error.message || 'Credenciais inválidas.');
             }
         });
     }

@@ -1,5 +1,11 @@
+// --- GUARDIÃO DE AUTENTICAÇÃO ---
+// Este código é executado primeiro. Se não houver token, o usuário é enviado para o login.
+const accessToken = localStorage.getItem('accessToken');
+if (!accessToken) {
+    window.location.href = 'login.html';
+}
+
 // Configuração da API
-// APONTAR PARA O ENDEREÇO ONDE SEU BACKEND ESTÁ RODANDO
 const API_BASE = 'http://localhost:3000'; 
 
 // Estado da aplicação
@@ -41,6 +47,7 @@ const elements = {
     cancelTurmaBtn: document.getElementById('cancel-turma'),
     novaTurmaBtn: document.getElementById('nova-turma-btn'),
     alunoTurmaSelect: document.getElementById('aluno-turma'),
+    professorTurmaSelect: document.getElementById('professor-turma'),
     
     // Views
     turmasView: document.getElementById('turmas-view'),
@@ -71,6 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Event Listeners
 function initializeEventListeners() {
+    // Listener para o botão de Logout (adicione o botão no seu index.html)
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
+    
     // Tabs
     elements.tabButtons.forEach(button => {
         button.addEventListener('click', () => switchTab(button.dataset.tab));
@@ -114,6 +127,13 @@ function initializeEventListeners() {
     });
 }
 
+// Função de Logout
+function logout() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+}
+
 // Máscaras para campos
 function setupFormMasks() {
     // Máscara para CPF
@@ -140,10 +160,9 @@ function setupFormMasks() {
     document.querySelectorAll('input[type="tel"]').forEach(input => {
         input.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, '');
-            // Formato (XX) XXXXX-XXXX para telefones com 9 dígitos no meio (celular)
             if (value.length > 10) { 
                 value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-            } else { // Formato (XX) XXXX-XXXX para telefones fixos ou com 8 dígitos no meio
+            } else {
                 value = value.replace(/^(\d{2})(\d{4})(\d{4}).*/, '($1) $2-$3');
             }
             e.target.value = value;
@@ -154,22 +173,16 @@ function setupFormMasks() {
 // Navegação entre abas
 function switchTab(tabName) {
     currentTab = tabName;
-    
-    // Atualizar botões
     elements.tabButtons.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === tabName);
     });
-    
-    // Atualizar conteúdo
     elements.tabContents.forEach(content => {
         content.classList.toggle('active', content.id === tabName);
     });
-    
-    // Carregar dados da aba
     if (tabName === 'professores') {
         loadProfessores();
     } else if (tabName === 'alunos') {
-        showTurmasView(); // Garante que a visão de turmas seja a padrão ao entrar na aba Alunos
+        showTurmasView();
         loadTurmas();
     }
 }
@@ -188,7 +201,7 @@ function debounce(func, wait) {
 }
 
 function showLoading() {
-    elements.loading.style.display = 'flex'; // Usar 'flex' para centralizar o spinner
+    elements.loading.style.display = 'flex';
 }
 
 function hideLoading() {
@@ -199,9 +212,7 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.textContent = message;
-    
     elements.toastContainer.appendChild(toast);
-    
     setTimeout(() => {
         toast.remove();
     }, 5000);
@@ -209,61 +220,58 @@ function showToast(message, type = 'info') {
 
 function formatDate(dateString) {
     if (!dateString) return '-';
-    // Se a data já for 'YYYY-MM-DD', new Date() pode ter problemas de fuso horário.
-    // É melhor parsear manualmente ou garantir que o backend envie um formato ISO completo.
-    // Para simplificar, vou assumir que o backend envia algo que Date() entende ou que é 'YYYY-MM-DD'.
-    const date = new Date(dateString + 'T00:00:00'); // Adiciona T00:00:00 para garantir UTC e evitar problemas de fuso.
+    const date = new Date(dateString + 'T00:00:00');
     return date.toLocaleDateString('pt-BR');
 }
 
 function formatCPF(cpf) {
     if (!cpf) return '-';
-    // Remove qualquer coisa que não seja dígito e aplica a máscara
     const cleanCpf = cpf.replace(/\D/g, '');
     return cleanCpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
-// API Calls - FUNÇÃO apiCall COM TRATAMENTO DE ERROS MELHORADO
+// API Calls - Versão SEGURA que envia o Token
 async function apiCall(endpoint, options = {}) {
+    showLoading();
     try {
-        showLoading();
-        const response = await fetch(`${API_BASE}${endpoint}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
-            ...options
-        });
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            logout(); // Segurança extra: se o token sumir, desloga
+            return;
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Adiciona o token ao cabeçalho
+            ...options.headers
+        };
+
+        const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
         
-        // **VERIFICAR A RESPOSTA ANTES DE TENTAR O JSON**
-        if (!response.ok) {
-            let errorData = {};
-            try {
-                // Tenta ler como JSON para pegar a mensagem de erro do servidor
-                errorData = await response.json();
-            } catch (e) {
-                // Se não for JSON (ex: HTML de erro), lê como texto simples
-                errorData = await response.text();
-            }
-            // Lança um erro com detalhes da resposta para depuração
-            throw new Error(errorData.error || `Erro na requisição: ${response.status} ${response.statusText}. Detalhes: ${JSON.stringify(errorData)}`);
+        // Se o token for inválido/expirado, o servidor retornará 401 ou 403
+        if (response.status === 401 || response.status === 403) {
+            showToast('Sua sessão expirou. Por favor, faça login novamente.', 'error');
+            setTimeout(logout, 2000);
+            return;
         }
         
-        // Se a resposta for OK, tenta parsear como JSON
-        const data = await response.json(); 
-        
-        return data;
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Erro de comunicação com o servidor.' }));
+            throw new Error(errorData.error);
+        }
+
+        if (response.headers.get("content-type")?.includes("application/json")) {
+            return response.json();
+        }
     } catch (error) {
-        // Exibe o erro no console para depuração mais detalhada
-        console.error('Erro na chamada da API:', error); 
-        // Mostra uma mensagem amigável ao usuário
+        console.error('API Call Error:', error);
         showToast(error.message, 'error');
-        // Re-lança o erro para que as funções que chamaram apiCall possam tratá-lo se necessário
-        throw error; 
+        throw error;
     } finally {
         hideLoading();
     }
 }
+
 
 // ===== TURMAS =====
 
@@ -273,7 +281,6 @@ async function loadTurmas() {
         renderTurmas(turmas);
     } catch (error) {
         console.error('Erro ao carregar turmas:', error);
-        // showToast já lida com a exibição, então não precisa repetir aqui
     }
 }
 
@@ -282,7 +289,6 @@ async function loadTurmasSelect() {
         const turmas = await apiCall('/api/turmas');
         const select = elements.alunoTurmaSelect;
         select.innerHTML = '<option value="">Selecione uma turma...</option>';
-        
         turmas.forEach(turma => {
             const option = document.createElement('option');
             option.value = turma.id;
@@ -291,6 +297,22 @@ async function loadTurmasSelect() {
         });
     } catch (error) {
         console.error('Erro ao carregar turmas para select:', error);
+    }
+}
+
+async function loadProfessorSelect() {
+    try {
+        const professores = await apiCall('/api/professores');
+        const select = elements.professorTurmaSelect;
+        select.innerHTML = '<option value="">Selecione um professor...</option>';
+        professores.forEach(professor => {
+            const option = document.createElement('option');
+            option.value = professor.id;
+            option.textContent = `${professor.nome_completo} - ${professor.disciplinas}`;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar os professores para select:', error);
     }
 }
 
@@ -305,12 +327,13 @@ function renderTurmas(turmas) {
         `;
         return;
     }
-    
+
     elements.turmasGrid.innerHTML = turmas.map(turma => `
         <div class="turma-card" onclick="showAlunosByTurma(${turma.id}, '${turma.nome}')">
             <h4>${turma.nome}</h4>
             <div class="turma-info">
                 <span class="turma-serie">${turma.serie}</span>
+                <span class="turma-professor">${turma.professor || 'Sem Professor'}</span> 
                 <span class="turma-ano">${turma.ano}</span>
             </div>
             <div class="turma-stats">
@@ -319,6 +342,11 @@ function renderTurmas(turmas) {
                     <span id="count-turma-${turma.id}">0</span> alunos
                 </span>
                 <div class="turma-actions" onclick="event.stopPropagation()">
+
+                    <button class="btn btn-icon btn-secondary" onclick="downloadTurmaPDF(${turma.id})" title="Baixar Relatório em PDF">
+                        <i class="fas fa-file-pdf"></i>
+                    </button>
+
                     <button class="btn btn-icon btn-edit" onclick="editTurma(${turma.id})" title="Editar turma">
                         <i class="fas fa-edit"></i>
                     </button>
@@ -329,8 +357,7 @@ function renderTurmas(turmas) {
             </div>
         </div>
     `).join('');
-    
-    // Carregar contagem de alunos para cada turma
+
     turmas.forEach(turma => {
         loadAlunosCount(turma.id);
     });
@@ -350,18 +377,25 @@ async function loadAlunosCount(turmaId) {
 
 function openTurmaModal(turma = null) {
     editingId = turma ? turma.id : null;
-    
-    // Limpar formulário
     elements.turmaForm.reset();
     
-    // Preencher dados se editando
     if (turma) {
         document.getElementById('turma-nome').value = turma.nome;
         document.getElementById('turma-serie').value = turma.serie;
         document.getElementById('turma-ano').value = turma.ano;
+        loadProfessorSelect().then(() => {
+            const professorOption = Array.from(elements.professorTurmaSelect.options).find(
+                option => option.textContent.startsWith(turma.professor + ' -')
+            );
+            if (professorOption) {
+                elements.professorTurmaSelect.value = professorOption.value;
+            } else {
+                elements.professorTurmaSelect.value = '';
+            }
+        });
     } else {
-        // Definir ano atual como padrão
         document.getElementById('turma-ano').value = new Date().getFullYear();
+        loadProfessorSelect();
     }
     
     elements.turmaModal.style.display = 'block';
@@ -374,9 +408,24 @@ function closeTurmaModal() {
 
 async function handleTurmaSubmit(e) {
     e.preventDefault();
-    
     const formData = new FormData(elements.turmaForm);
     const data = Object.fromEntries(formData.entries());
+
+    const selectedProfessorId = elements.professorTurmaSelect.value;
+    if (selectedProfessorId) {
+        try {
+            const professor = await apiCall(`/api/professores/${selectedProfessorId}`);
+            data.professor = professor.nome_completo;
+        } catch (error) {
+            console.error('Erro ao obter nome do professor:', error);
+            showToast('Erro ao obter nome do professor para a turma.', 'error');
+            return;
+        }
+    } else {
+        data.professor = null;
+    }
+    
+    delete data.turma_id;
     
     try {
         if (editingId) {
@@ -391,8 +440,6 @@ async function handleTurmaSubmit(e) {
                 body: JSON.stringify(data)
             });
             showToast('Turma criada com sucesso!', 'success');
-            
-            // Se estamos criando turma a partir do modal de aluno, selecionar a nova turma
             if (elements.alunoModal.style.display === 'block') {
                 await loadTurmasSelect();
                 elements.alunoTurmaSelect.value = result.id;
@@ -401,7 +448,8 @@ async function handleTurmaSubmit(e) {
         
         closeTurmaModal();
         loadTurmas();
-        loadTurmasSelect(); // Recarrega o select de turmas em todos os modais de aluno abertos
+        loadTurmasSelect();
+        loadProfessorSelect();
     } catch (error) {
         console.error('Erro ao salvar turma:', error);
     }
@@ -428,8 +476,69 @@ async function executeTurmaDelete(id) {
         showToast('Turma excluída com sucesso!', 'success');
         loadTurmas();
         loadTurmasSelect();
+        loadProfessorSelect();
     } catch (error) {
         console.error('Erro ao excluir turma:', error);
+    }
+}
+
+async function downloadTurmaPDF(turmaId) {
+    showLoading();
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            logout(); // Se não houver token, desloga.
+            return;
+        }
+
+        const response = await fetch(`${API_BASE}/api/turmas/${turmaId}/pdf`, {
+            method: 'GET',
+            headers: {
+                // Envia o token de autorização para passar pela segurança do servidor
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            // Se o servidor retornar um erro (ex: turma não encontrada), mostra a mensagem
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Não foi possível gerar o PDF.');
+        }
+
+        // Pega o nome do arquivo do cabeçalho da resposta enviado pelo servidor
+        const disposition = response.headers.get('content-disposition');
+        let filename = 'relatorio_turma.pdf'; // Nome padrão
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            const matches = filenameRegex.exec(disposition);
+            if (matches != null && matches[1]) {
+                filename = matches[1].replace(/['"]/g, '');
+            }
+        }
+
+        // Converte a resposta do PDF em um "blob" (um tipo de arquivo no navegador)
+        const blob = await response.blob();
+
+        // Cria um link temporário na memória para o arquivo
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename; // Define o nome do arquivo para o download
+        
+        // Simula o clique no link para iniciar o download
+        document.body.appendChild(a);
+        a.click();
+        
+        // Limpa o link da memória
+        window.URL.revokeObjectURL(url);
+        a.remove();
+
+    } catch (error) {
+        console.error('Erro ao baixar o PDF:', error);
+        showToast(error.message, 'error');
+    } finally {
+        hideLoading();
     }
 }
 
@@ -439,7 +548,7 @@ function showTurmasView() {
     elements.turmasView.style.display = 'block';
     elements.alunosView.style.display = 'none';
     currentTurmaId = null;
-    loadTurmas(); // Recarrega as turmas ao voltar para a visão de turmas
+    loadTurmas();
 }
 
 function showAlunosView(turmaId = null, turmaNome = null) {
@@ -448,7 +557,7 @@ function showAlunosView(turmaId = null, turmaNome = null) {
     
     if (turmaId) {
         currentTurmaId = turmaId;
-        elements.alunosViewTitle.textContent = `Alunos da ${turmaNome}`;
+        elements.alunosViewTitle.textContent = `Alunos de ${turmaNome}`;
         loadAlunosByTurma(turmaId);
     } else {
         currentTurmaId = null;
@@ -475,13 +584,7 @@ async function loadProfessores() {
 function renderProfessores(professores) {
     if (professores.length === 0) {
         elements.professorTable.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty-state">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    <h3>Nenhum professor cadastrado</h3>
-                    <p>Clique em "Novo Professor" para começar</p>
-                </td>
-            </tr>
+            <tr><td colspan="7" class="empty-state"><i class="fas fa-chalkboard-teacher"></i><h3>Nenhum professor cadastrado</h3><p>Clique em "Novo Professor" para começar</p></td></tr>
         `;
         return;
     }
@@ -495,12 +598,8 @@ function renderProfessores(professores) {
             <td>${professor.disciplinas}</td>
             <td><span class="status-badge status-${professor.status.toLowerCase()}">${professor.status}</span></td>
             <td class="actions">
-                <button class="btn btn-edit" onclick="editProfessor(${professor.id})">
-                    <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-delete" onclick="deleteProfessor(${professor.id}, '${professor.nome_completo}')">
-                    <i class="fas fa-trash"></i> Excluir
-                </button>
+                <button class="btn btn-edit" onclick="editProfessor(${professor.id})"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn btn-delete" onclick="deleteProfessor(${professor.id}, '${professor.nome_completo}')"><i class="fas fa-trash"></i> Excluir</button>
             </td>
         </tr>
     `).join('');
@@ -508,7 +607,6 @@ function renderProfessores(professores) {
 
 async function searchProfessores() {
     const termo = elements.searchProfessores.value.trim();
-    
     try {
         let professores;
         if (termo) {
@@ -525,16 +623,12 @@ async function searchProfessores() {
 function openProfessorModal(professor = null) {
     editingId = professor ? professor.id : null;
     elements.professorModalTitle.textContent = professor ? 'Editar Professor' : 'Novo Professor';
-    
-    // Limpar formulário
     elements.professorForm.reset();
     
-    // Preencher dados se editando
     if (professor) {
         Object.keys(professor).forEach(key => {
             const input = document.querySelector(`#professor-form [name="${key}"]`);
             if (input) {
-                // Formatar datas para o input type="date"
                 if (key.includes('data_nascimento') || key.includes('data_admissao')) {
                     input.value = professor[key] ? new Date(professor[key]).toISOString().split('T')[0] : '';
                 } else {
@@ -543,7 +637,6 @@ function openProfessorModal(professor = null) {
             }
         });
     }
-    
     elements.professorModal.style.display = 'block';
 }
 
@@ -554,7 +647,6 @@ function closeProfessorModal() {
 
 async function handleProfessorSubmit(e) {
     e.preventDefault();
-    
     const formData = new FormData(elements.professorForm);
     const data = Object.fromEntries(formData.entries());
     
@@ -572,9 +664,9 @@ async function handleProfessorSubmit(e) {
             });
             showToast('Professor cadastrado com sucesso!', 'success');
         }
-        
         closeProfessorModal();
         loadProfessores();
+        loadProfessorSelect();
     } catch (error) {
         console.error('Erro ao salvar professor:', error);
     }
@@ -605,6 +697,7 @@ async function executeProfessorDelete(id) {
     }
 }
 
+
 // ===== ALUNOS =====
 
 async function loadAlunos() {
@@ -628,17 +721,10 @@ async function loadAlunosByTurma(turmaId) {
 function renderAlunos(alunos) {
     if (alunos.length === 0) {
         elements.alunoTable.innerHTML = `
-            <tr>
-                <td colspan="6" class="empty-state">
-                    <i class="fas fa-user-graduate"></i>
-                    <h3>Nenhum aluno encontrado</h3>
-                    <p>Clique em "Novo Aluno" para começar</p>
-                </td>
-            </tr>
+            <tr><td colspan="6" class="empty-state"><i class="fas fa-user-graduate"></i><h3>Nenhum aluno encontrado</h3><p>Clique em "Novo Aluno" para começar</p></td></tr>
         `;
         return;
     }
-    
     elements.alunoTable.innerHTML = alunos.map(aluno => `
         <tr>
             <td>${aluno.nome_completo}</td>
@@ -647,12 +733,8 @@ function renderAlunos(alunos) {
             <td>${aluno.nome_responsavel}</td>
             <td><span class="status-badge status-${aluno.status.toLowerCase()}">${aluno.status}</span></td>
             <td class="actions">
-                <button class="btn btn-edit" onclick="editAluno(${aluno.id})">
-                    <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-delete" onclick="deleteAluno(${aluno.id}, '${aluno.nome_completo}')">
-                    <i class="fas fa-trash"></i> Excluir
-                </button>
+                <button class="btn btn-edit" onclick="editAluno(${aluno.id})"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn btn-delete" onclick="deleteAluno(${aluno.id}, '${aluno.nome_completo}')"><i class="fas fa-trash"></i> Excluir</button>
             </td>
         </tr>
     `).join('');
@@ -660,7 +742,6 @@ function renderAlunos(alunos) {
 
 async function searchAlunos() {
     const termo = elements.searchAlunos.value.trim();
-    
     try {
         let alunos;
         if (termo) {
@@ -680,21 +761,17 @@ async function openAlunoModal(aluno = null) {
     editingId = aluno ? aluno.id : null;
     elements.alunoModalTitle.textContent = aluno ? 'Editar Aluno' : 'Novo Aluno';
     
-    // Carregar turmas no select antes de preencher
     await loadTurmasSelect(); 
     
-    // Limpar formulário
     elements.alunoForm.reset();
     
-    // Preencher dados se editando
     if (aluno) {
         Object.keys(aluno).forEach(key => {
             const input = document.querySelector(`#aluno-form [name="${key}"]`);
             if (input) {
-                // Formatar datas para o input type="date"
                 if (key.includes('data_nascimento')) {
                     input.value = aluno[key] ? new Date(aluno[key]).toISOString().split('T')[0] : '';
-                } else if (key === 'turma_id') { // Selecionar a turma correta no dropdown
+                } else if (key === 'turma_id') {
                     elements.alunoTurmaSelect.value = aluno[key] || '';
                 } else {
                     input.value = aluno[key] || '';
@@ -702,7 +779,6 @@ async function openAlunoModal(aluno = null) {
             }
         });
     } else {
-        // Definir ano atual como padrão para ano de ingresso
         document.getElementById('aluno-ano-ingresso').value = new Date().getFullYear();
     }
     
@@ -716,37 +792,25 @@ function closeAlunoModal() {
 
 async function handleAlunoSubmit(e) {
     e.preventDefault();
-    
     const formData = new FormData(elements.alunoForm);
     const data = Object.fromEntries(formData.entries());
-    
-    // Converter turma_id para null se vazio ou indefinido
     data.turma_id = data.turma_id === '' ? null : parseInt(data.turma_id, 10);
     
     try {
         if (editingId) {
-            await apiCall(`/api/alunos/${editingId}`, {
-                method: 'PUT',
-                body: JSON.stringify(data)
-            });
+            await apiCall(`/api/alunos/${editingId}`, { method: 'PUT', body: JSON.stringify(data) });
             showToast('Aluno atualizado com sucesso!', 'success');
         } else {
-            await apiCall('/api/alunos', {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
+            await apiCall('/api/alunos', { method: 'POST', body: JSON.stringify(data) });
             showToast('Aluno cadastrado com sucesso!', 'success');
         }
-        
         closeAlunoModal();
-        
-        // Recarregar dados apropriados
         if (currentTurmaId) {
             loadAlunosByTurma(currentTurmaId);
         } else {
             loadAlunos();
         }
-        loadTurmas(); // Atualizar contagem de alunos nas turmas
+        loadTurmas();
     } catch (error) {
         console.error('Erro ao salvar aluno:', error);
     }
@@ -755,7 +819,7 @@ async function handleAlunoSubmit(e) {
 async function editAluno(id) {
     try {
         const aluno = await apiCall(`/api/alunos/${id}`);
-        await openAlunoModal(aluno); // Aguardar o modal abrir e carregar turmas antes de preencher
+        await openAlunoModal(aluno);
     } catch (error) {
         console.error('Erro ao carregar aluno:', error);
     }
@@ -771,14 +835,12 @@ async function executeAlunoDelete(id) {
     try {
         await apiCall(`/api/alunos/${id}`, { method: 'DELETE' });
         showToast('Aluno excluído com sucesso!', 'success');
-        
-        // Recarregar dados apropriados
         if (currentTurmaId) {
             loadAlunosByTurma(currentTurmaId);
         } else {
             loadAlunos();
         }
-        loadTurmas(); // Atualizar contagem de alunos nas turmas
+        loadTurmas();
     } catch (error) {
         console.error('Erro ao excluir aluno:', error);
     }

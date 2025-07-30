@@ -6,12 +6,16 @@
     <title>Sistema de Gestão Escolar</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1><i class="fas fa-graduation-cap"></i> Sistema de Gestão Escolar</h1>
+            <h1><i class="fas fa-graduation-cap"></i> Sistema de Gestão Escolar</h1>          
             <p>Painel do Diretor</p>
+            <div>
+                <p id="user-greeting"></p> <button id="logout-btn" class="btn btn-danger">Sair</button>
+            </div>  
         </header>
 
         <nav class="tabs">
@@ -437,6 +441,14 @@
                             <option value="3º Médio">3º Médio</option>
                         </select>
                     </div>
+                    <!-- Selecionar professor - Nova tabela -->
+                    <div class="form-group">
+                        <label for="professor-turma">Professor *</label>
+                        <select id="professor-turma" name="turma_id">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="turma-ano">Ano *</label>
                         <input type="number" id="turma-ano" name="ano" min="2000" max="2030" required>

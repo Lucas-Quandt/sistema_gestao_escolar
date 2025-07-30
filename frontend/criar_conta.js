@@ -1,38 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.querySelector('.register-form');
+    const toastContainer = document.getElementById('toast-container');
+
+    function showToast(message, type = 'error') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        if(toastContainer) toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
 
     if (registerForm) {
-        registerForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Impede o envio padrão do formulário
-
-            const nameInput = document.getElementById('register-name');
-            const emailInput = document.getElementById('register-email');
-            const passwordInput = document.getElementById('register-password');
-            const confirmPasswordInput = document.getElementById('register-confirm-password');
-
-            const name = nameInput.value;
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
+        registerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
 
             if (password !== confirmPassword) {
-                alert('As senhas não coincidem. Por favor, tente novamente.');
+                showToast('As senhas não coincidem.');
                 return;
             }
 
-            // Em uma aplicação real, você enviaria esses dados para um servidor.
-            // Para esta demonstração, vamos armazená-los no localStorage.
-            const user = {
-                name: name,
-                email: email,
-                password: password // ATENÇÃO: Em produção, nunca armazene senhas em texto puro! Use hash e salt.
-            };
+            try {
+                const response = await fetch('http://localhost:3000/api/registrar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome: name, email: email, senha: password })
+                });
 
-            // Armazena os dados do usuário no localStorage. Usamos 'registeredUser' como chave.
-            localStorage.setItem('registeredUser', JSON.stringify(user));
-            
-            alert('Conta criada com sucesso! Você será redirecionado para a página de login.');
-            window.location.href = 'login.html'; // Redireciona para a página de login
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+
+                showToast('Conta criada com sucesso! Redirecionando para login...', 'success');
+                setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+            } catch (error) {
+                showToast(error.message || 'Erro ao criar conta.');
+            }
         });
     }
 });
