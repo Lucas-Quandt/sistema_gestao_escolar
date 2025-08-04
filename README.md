@@ -83,8 +83,14 @@ sistema-gestao-escolar/
 │   ├── package.json       # Dependências do Node.js
 │   └── escola.db          # Banco de dados SQLite (criado automaticamente)
 ├── frontend/
-│   ├── index.html         # Interface principal
+│   ├── img  
+│   ├── criar_conta.html
+│   ├── criar_conta.js 
+│   ├── index.html          # Interface principal
+│   ├── login.html
+│   ├── login.js  
 │   ├── styles.css         # Estilos CSS
+│   ├── style2.css 
 │   └── script.js          # Lógica JavaScript
 └── README.md              # Documentação
 ```
