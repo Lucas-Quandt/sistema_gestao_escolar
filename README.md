@@ -74,6 +74,18 @@ Um sistema completo de gestão escolar desenvolvido com HTML, CSS, JavaScript e 
 - **Estilo:** CSS Grid, Flexbox, Gradientes
 - **Ícones:** Font Awesome
 
+## 📸 Demonstração
+
+Abaixo estão capturas de tela do projeto, mostrando o layout e as funcionalidades implementadas de responsividade:
+
+***<img width="1594" height="906" alt="Captura de tela 2025-08-04 092112" src="https://github.com/user-attachments/assets/83aa6d57-231b-4610-94f0-dce312318394" />***
+
+***<img width="1593" height="900" alt="Captura de tela 2025-08-04 092130" src="https://github.com/user-attachments/assets/e7969ffa-3494-4e27-9265-e9951dbf9c94" />***
+
+***<img width="1585" height="912" alt="Captura de tela 2025-08-04 092148" src="https://github.com/user-attachments/assets/f0cbd6ee-b208-4576-9e0f-7160ad60903c" />***
+
+***<img width="1557" height="909" alt="Captura de tela 2025-08-04 092200" src="https://github.com/user-attachments/assets/855abf52-4200-456a-ae12-7304a9ffdf95" />***
+
 ## 📁 Estrutura do Projeto
 
 ```
@@ -294,4 +306,6 @@ Este projeto foi desenvolvido para fins educacionais e de demonstração.
 ---
 
 **Sistema de Gestão Escolar** - Desenvolvido com ❤️ usando tecnologias web modernas.
+
+
 
