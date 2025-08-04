@@ -292,7 +292,7 @@ async function loadTurmasSelect() {
         turmas.forEach(turma => {
             const option = document.createElement('option');
             option.value = turma.id;
-            option.textContent = `${turma.nome} - ${turma.serie}`;
+            option.textContent = `${turma.nome}`;
             select.appendChild(option);
         });
     } catch (error) {
@@ -332,7 +332,6 @@ function renderTurmas(turmas) {
         <div class="turma-card" onclick="showAlunosByTurma(${turma.id}, '${turma.nome}')">
             <h4>${turma.nome}</h4>
             <div class="turma-info">
-                <span class="turma-serie">${turma.serie}</span>
                 <span class="turma-professor">${turma.professor || 'Sem Professor'}</span> 
                 <span class="turma-ano">${turma.ano}</span>
             </div>
@@ -381,7 +380,6 @@ function openTurmaModal(turma = null) {
     
     if (turma) {
         document.getElementById('turma-nome').value = turma.nome;
-        document.getElementById('turma-serie').value = turma.serie;
         document.getElementById('turma-ano').value = turma.ano;
         loadProfessorSelect().then(() => {
             const professorOption = Array.from(elements.professorTurmaSelect.options).find(
@@ -727,10 +725,10 @@ function renderAlunos(alunos) {
     }
     elements.alunoTable.innerHTML = alunos.map(aluno => `
         <tr>
+            <td>${aluno.id}</td>
             <td>${aluno.nome_completo}</td>
             <td>${formatCPF(aluno.cpf)}</td>
             <td>${aluno.turma_nome || 'Sem turma'}</td>
-            <td>${aluno.nome_responsavel}</td>
             <td><span class="status-badge status-${aluno.status.toLowerCase()}">${aluno.status}</span></td>
             <td class="actions">
                 <button class="btn btn-edit" onclick="editAluno(${aluno.id})"><i class="fas fa-edit"></i> Editar</button>

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestão Escolar</title>
+    <link rel="icon" href="img/logo.ico">
+
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
@@ -11,6 +13,7 @@
 <body>
     <div class="container">
         <header class="header">
+            <img src="img/logo.png" alt="Logo do Sistema de Gestão Escolar" class="header-logo">
             <h1><i class="fas fa-graduation-cap"></i> Sistema de Gestão Escolar</h1>          
             <p>Painel do Diretor</p>
             <div>
@@ -92,10 +95,10 @@
                     <table id="alunos-table">
                         <thead>
                             <tr>
+                                <th>Matrícula</th>
                                 <th>Nome</th>
                                 <th>CPF</th>
                                 <th>Turma</th>
-                                <th>Responsável</th>
                                 <th>Status</th>
                                 <th>Ações</th>
                             </tr>
@@ -143,10 +146,10 @@
                 </div>
                 
                 <div class="form-row">
-                    <div class="form-group">
+                    <!--<div class="form-group">
                         <label for="professor-rg">RG *</label>
                         <input type="text" id="professor-rg" name="rg" required>
-                    </div>
+                    </div>-->
                     <div class="form-group">
                         <label for="professor-telefone">Telefone *</label>
                         <input type="tel" id="professor-telefone" name="telefone" placeholder="(11) 99999-9999" required>
@@ -288,11 +291,21 @@
                         <input type="text" id="aluno-cpf" name="cpf" placeholder="000.000.000-00" required>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="aluno-email">Email *</label>
+                    <input type="email" id="aluno-email" name="email_aluno" required>
+                </div>
                 
                 <div class="form-group">
+                    <label for="aluno-telefone">Telefone *</label>
+                    <input type="tel" id="aluno-telefone" name="telefone_aluno" placeholder="(11) 99999-9999" required>
+                </div>
+                
+                <!--<div class="form-group">
                     <label for="aluno-rg">RG</label>
                     <input type="text" id="aluno-rg" name="rg">
-                </div>
+                </div>-->
                 
                 <h4>Endereço</h4>
                 <div class="form-row">
@@ -357,23 +370,6 @@
                     </div>
                 </div>
                 
-                <h4>Dados do Responsável</h4>
-                <div class="form-group">
-                    <label for="aluno-nome-responsavel">Nome do Responsável *</label>
-                    <input type="text" id="aluno-nome-responsavel" name="nome_responsavel" required>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="aluno-telefone-responsavel">Telefone do Responsável *</label>
-                        <input type="tel" id="aluno-telefone-responsavel" name="telefone_responsavel" placeholder="(11) 99999-9999" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="aluno-email-responsavel">Email do Responsável *</label>
-                        <input type="email" id="aluno-email-responsavel" name="email_responsavel" required>
-                    </div>
-                </div>
-                
                 <h4>Informações Escolares</h4>
                 <div class="form-row">
                     <div class="form-group">
@@ -423,24 +419,6 @@
                     <input type="text" id="turma-nome" name="nome" placeholder="Ex: 9º Ano A" required>
                 </div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="turma-serie">Série *</label>
-                        <select id="turma-serie" name="serie" required>
-                            <option value="">Selecione...</option>
-                            <option value="1º Ano">1º Ano</option>
-                            <option value="2º Ano">2º Ano</option>
-                            <option value="3º Ano">3º Ano</option>
-                            <option value="4º Ano">4º Ano</option>
-                            <option value="5º Ano">5º Ano</option>
-                            <option value="6º Ano">6º Ano</option>
-                            <option value="7º Ano">7º Ano</option>
-                            <option value="8º Ano">8º Ano</option>
-                            <option value="9º Ano">9º Ano</option>
-                            <option value="1º Médio">1º Médio</option>
-                            <option value="2º Médio">2º Médio</option>
-                            <option value="3º Médio">3º Médio</option>
-                        </select>
-                    </div>
                     <!-- Selecionar professor - Nova tabela -->
                     <div class="form-group">
                         <label for="professor-turma">Professor *</label>

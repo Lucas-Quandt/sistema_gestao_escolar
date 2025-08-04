@@ -1,24 +1,26 @@
-/* Reset e configurações básicas */
+/* Reset e configurações básicas (Mantido do style.css) */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Body: Cores e estilo de fundo do style2.css */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Mantido do style.css para consistência */
+    background-color: #a4d6ff; /* Cor de fundo principal do style2.css */
+    height: 100vh; /* Para que o fundo ocupe toda a altura */
+    color: #333; /* Cor do texto padrão do style2.css */
 }
 
+/* Container (Mantido do style.css para layout do dashboard) */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Header */
+/* Header (Mantido do style.css, mas ajustando cores se necessário) */
 .header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -29,25 +31,50 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
+/* --- ESTILOS PARA A LOGO NO CABEÇALHO PRINCIPAL --- */
 .header h1 {
-    color: #4a5568;
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+    color: #333; /* Ajustado para a cor de texto do style2.css */
+    font-size: 2.2rem;
+    margin-bottom: 0; /* Removido para controle via flexbox gap */
     font-weight: 700;
+    /* Define o h1 como um container flexível para alinhar os itens */
+    display: flex;
+    /* Alinha a logo, ícone e texto verticalmente ao centro */
+    align-items: center;
+    /* Centraliza todo o conteúdo do H1 (logo + ícone + texto) horizontalmente */
+    justify-content: center;
+    /* Define o espaçamento entre a logo, o ícone e o texto */
+    gap: 15px;
+}
+
+.header .header-logo {
+    /* Define a altura da logo. Ajuste este valor conforme o tamanho da sua imagem. */
+    height: 98px;
+    /* Garante que a largura da logo se ajuste proporcionalmente */
+    width: auto;
+    align-items: center;
+}
+
+/* Ajusta o ícone de graduação para que não haja margem excessiva, já que o flex 'gap' o controla */
+.header h1 .fas.fa-graduation-cap {
+    margin-right: 0; /* Zera a margem direita padrão que você tinha */
+    color: #00aeef; /* Mantém a cor original do ícone */
 }
 
 .header p {
-    color: #718096;
+    color: #555; /* Ajustado para a cor de texto secundária do style2.css */
     font-size: 1.1rem;
     font-weight: 500;
+    margin-top: 10px; /* Adiciona um espaço entre o título e o parágrafo "Painel do Diretor" */
 }
 
+/* Regra original para o ícone, pode ser mantida ou substituída pela mais específica acima se só se aplicar ao h1 */
 .header i {
-    margin-right: 10px;
-    color: #667eea;
+    /* margin-right: 10px; */ /* Comentado ou removido pois agora é controlado pelo 'gap' no h1 flex */
+    color: #00aeef; /* Cor de destaque do style2.css */
 }
 
-/* Navigation Tabs */
+/* Navigation Tabs (Mantido do style.css, cores ajustadas) */
 .tabs {
     display: flex;
     background: rgba(255, 255, 255, 0.95);
@@ -64,7 +91,7 @@ body {
     padding: 15px 20px;
     border: none;
     background: transparent;
-    color: #718096;
+    color: #555; /* Cor de texto do style2.css */
     font-size: 1rem;
     font-weight: 600;
     border-radius: 10px;
@@ -77,18 +104,18 @@ body {
 }
 
 .tab-button:hover {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
+    background: rgba(0, 174, 239, 0.1); /* Cor de destaque do style2.css com transparência */
+    color: #00aeef; /* Cor de destaque do style2.css */
     transform: translateY(-2px);
 }
 
 .tab-button.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #00aeef; /* Cor principal do style2.css */
     color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 174, 239, 0.4);
 }
 
-/* Tab Content */
+/* Tab Content (Mantido do style.css) */
 .tab-content {
     display: none;
     background: rgba(255, 255, 255, 0.95);
@@ -108,7 +135,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Content Header */
+/* Content Header (Mantido do style.css) */
 .content-header {
     display: flex;
     justify-content: space-between;
@@ -119,12 +146,12 @@ body {
 }
 
 .content-header h2 {
-    color: #4a5568;
+    color: #333; /* Ajustado para a cor de texto do style2.css */
     font-size: 1.8rem;
     font-weight: 700;
 }
 
-/* Search Container */
+/* Search Container (Mantido do style.css, borda de foco ajustada) */
 .search-container {
     position: relative;
     flex: 1;
@@ -134,7 +161,7 @@ body {
 .search-container input {
     width: 100%;
     padding: 12px 45px 12px 15px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #e0e0e0; /* Cor de borda do style2.css */
     border-radius: 10px;
     font-size: 1rem;
     transition: all 0.3s ease;
@@ -143,8 +170,8 @@ body {
 
 .search-container input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #00aeef; /* Cor de destaque do style2.css */
+    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
 }
 
 .search-icon {
@@ -152,11 +179,11 @@ body {
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #a0aec0;
+    color: #999; /* Cor de ícone do style2.css */
     font-size: 1.1rem;
 }
 
-/* Buttons */
+/* Buttons (Cores ajustadas para as do style2.css) */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -172,28 +199,29 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #00aeef; /* Cor principal do style2.css */
     color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 174, 239, 0.4);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    background: #008ec3; /* Cor de hover do style2.css */
+    box-shadow: 0 6px 20px rgba(0, 174, 239, 0.6);
 }
 
 .btn-secondary {
-    background: #e2e8f0;
+    background: #e0e0e0; /* Cor de borda/fundo neutra do style2.css */
     color: #4a5568;
 }
 
 .btn-secondary:hover {
-    background: #cbd5e0;
+    background: #b0b0b0; /* Um pouco mais escuro para hover */
     transform: translateY(-2px);
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    background: #f56565; /* Mantido o vermelho do style.css para "danger" */
     color: white;
 }
 
@@ -203,7 +231,7 @@ body {
 }
 
 .btn-edit {
-    background: linear-gradient(135deg, #4fd1c7 0%, #38b2ac 100%);
+    background: #00aeef; /* Usando a cor principal do style2.css para edit */
     color: white;
     padding: 8px 12px;
     font-size: 0.9rem;
@@ -211,11 +239,12 @@ body {
 
 .btn-edit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(56, 178, 172, 0.4);
+    background: #008ec3;
+    box-shadow: 0 4px 15px rgba(0, 174, 239, 0.4);
 }
 
 .btn-delete {
-    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    background: #f56565; /* Mantido o vermelho do style.css para delete */
     color: white;
     padding: 8px 12px;
     font-size: 0.9rem;
@@ -226,7 +255,7 @@ body {
     box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
 }
 
-/* Table */
+/* Table (Cores ajustadas para as do style2.css) */
 .table-container {
     overflow-x: auto;
     border-radius: 10px;
@@ -242,7 +271,7 @@ table {
 }
 
 thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #00aeef; /* Cor principal do style2.css */
 }
 
 thead th {
@@ -262,7 +291,7 @@ tbody tr:nth-child(even) {
 }
 
 tbody tr:hover {
-    background: rgba(102, 126, 234, 0.05);
+    background: rgba(0, 174, 239, 0.05); /* Cor de destaque do style2.css com transparência */
     transform: scale(1.01);
 }
 
@@ -277,7 +306,7 @@ tbody td {
     gap: 8px;
 }
 
-/* Modal */
+/* Modal (Mantido do style.css, cores ajustadas) */
 .modal {
     display: none;
     position: fixed;
@@ -307,7 +336,7 @@ tbody td {
 }
 
 .modal-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #00aeef; /* Cor principal do style2.css */
     color: white;
     padding: 20px 30px;
     border-radius: 15px 15px 0 0;
@@ -338,7 +367,7 @@ tbody td {
     padding: 30px;
 }
 
-/* Form */
+/* Form (Mantido do style.css, borda de foco ajustada) */
 form {
     padding: 30px;
 }
@@ -355,20 +384,25 @@ form {
     font-size: 0.95rem;
 }
 
-.form-group input {
+.form-group input,
+.form-group select,
+.form-group textarea { /* Incluindo select e textarea */
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #e0e0e0; /* Cor de borda do style2.css */
     border-radius: 10px;
     font-size: 1rem;
     transition: all 0.3s ease;
     background: white;
+    font-family: inherit; /* Garante que o textarea use a mesma fonte */
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #00aeef; /* Cor de destaque do style2.css */
+    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
 }
 
 .form-actions {
@@ -380,8 +414,8 @@ form {
     border-top: 1px solid #e2e8f0;
 }
 
-/* Loading */
-.loading {
+/* Loading (Mantido do style.css, cor do spinner ajustada) */
+#loading {
     display: none;
     position: fixed;
     z-index: 2000;
@@ -391,28 +425,27 @@ form {
     height: 100%;
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(5px);
+    justify-content: center; /* Adicionado para centralizar o spinner */
+    align-items: center; /* Adicionado para centralizar o spinner */
 }
 
 .spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative; /* Ajustado para que o spinner funcione dentro do flexbox */
     width: 50px;
     height: 50px;
     border: 4px solid #e2e8f0;
-    border-top: 4px solid #667eea;
+    border-top: 4px solid #00aeef; /* Cor de destaque do style2.css */
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+    0% { transform: rotate(0deg); } /* Removido translate para o spinner, já que o pai está centralizando */
+    100% { transform: rotate(360deg); }
 }
 
-/* Toast Notifications */
-.toast-container {
+/* Toast Notifications (Mantido do style.css, cores ajustadas) */
+#toast-container {
     position: fixed;
     top: 20px;
     right: 20px;
@@ -425,21 +458,21 @@ form {
     padding: 15px 20px;
     margin-bottom: 10px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid;
+    border-left: 4px solid #00aeef; /* Cor principal do style2.css */
     animation: toastSlideIn 0.3s ease;
     max-width: 300px;
 }
 
 .toast.success {
-    border-left-color: #48bb78;
+    border-left-color: #48bb78; /* Mantido verde para sucesso */
 }
 
 .toast.error {
-    border-left-color: #f56565;
+    border-left-color: #f56565; /* Mantido vermelho para erro */
 }
 
 .toast.info {
-    border-left-color: #4299e1;
+    border-left-color: #00aeef; /* Usando a cor principal do style2.css para info */
 }
 
 @keyframes toastSlideIn {
@@ -447,14 +480,21 @@ form {
     to { opacity: 1; transform: translateX(0); }
 }
 
-/* Responsive Design */
+/* Responsive Design (Mantido do style.css) */
 @media (max-width: 768px) {
     .container {
         padding: 10px;
     }
     
+    /* --- RESPONSIVIDADE PARA A LOGO NO CABEÇALHO --- */
     .header h1 {
-        font-size: 2rem;
+        flex-direction: column; /* Em telas menores, empilha a logo e o texto */
+        font-size: 2rem; /* Reduz o tamanho da fonte do título */
+        gap: 10px; /* Reduz o espaçamento entre os itens empilhados */
+    }
+
+    .header .header-logo {
+        height: 50px; /* Reduz o tamanho da logo em telas menores */
     }
     
     .content-header {
@@ -509,6 +549,10 @@ form {
         font-size: 1.8rem;
     }
     
+    .header .header-logo {
+        height: 40px; /* Mais redução para telas muito pequenas */
+    }
+
     .tab-content {
         padding: 20px;
     }
@@ -522,7 +566,7 @@ form {
     }
 }
 
-/* Empty State */
+/* Empty State (Mantido do style.css, cores ajustadas) */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -546,9 +590,7 @@ form {
     margin-bottom: 30px;
 }
 
-
-
-/* Form Rows */
+/* Form Rows (Mantido do style.css) */
 .form-row {
     display: flex;
     gap: 20px;
@@ -564,7 +606,7 @@ form {
     flex: 2;
 }
 
-/* Form Sections */
+/* Form Sections (Mantido do style.css) */
 form h4 {
     color: #4a5568;
     font-size: 1.1rem;
@@ -574,11 +616,11 @@ form h4 {
     border-bottom: 2px solid #e2e8f0;
 }
 
-/* Select Styling */
+/* Select Styling (Cores ajustadas para as do style2.css) */
 select {
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #e0e0e0; /* Cor de borda do style2.css */
     border-radius: 10px;
     font-size: 1rem;
     transition: all 0.3s ease;
@@ -588,15 +630,15 @@ select {
 
 select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #00aeef; /* Cor de destaque do style2.css */
+    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
 }
 
-/* Textarea Styling */
+/* Textarea Styling (Cores ajustadas para as do style2.css) */
 textarea {
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #e0e0e0; /* Cor de borda do style2.css */
     border-radius: 10px;
     font-size: 1rem;
     transition: all 0.3s ease;
@@ -607,11 +649,11 @@ textarea {
 
 textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #00aeef; /* Cor de destaque do style2.css */
+    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
 }
 
-/* Turma Selection */
+/* Turma Selection (Mantido do style.css) */
 .turma-selection {
     display: flex;
     gap: 10px;
@@ -628,7 +670,7 @@ textarea:focus {
     white-space: nowrap;
 }
 
-/* Turmas Grid */
+/* Turmas Grid (Mantido do style.css, cores ajustadas) */
 .turmas-view {
     margin-bottom: 30px;
 }
@@ -667,7 +709,7 @@ textarea:focus {
 .turma-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: #667eea;
+    border-color: #00aeef; /* Cor de destaque do style2.css */
 }
 
 .turma-card h4 {
@@ -693,7 +735,7 @@ textarea:focus {
 }
 
 .turma-ano {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #00aeef; /* Cor principal do style2.css */
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -714,7 +756,7 @@ textarea:focus {
 }
 
 .alunos-count i {
-    color: #667eea;
+    color: #00aeef; /* Cor de destaque do style2.css */
     margin-right: 5px;
 }
 
@@ -729,7 +771,7 @@ textarea:focus {
     border-radius: 6px;
 }
 
-/* Empty Turmas State */
+/* Empty Turmas State (Mantido do style.css) */
 .empty-turmas {
     text-align: center;
     padding: 60px 20px;
@@ -753,14 +795,14 @@ textarea:focus {
     margin-bottom: 30px;
 }
 
-/* Modal Adjustments for Larger Forms */
+/* Modal Adjustments for Larger Forms (Mantido do style.css) */
 .modal-content {
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
 }
 
-/* Responsive Adjustments */
+/* Responsive Adjustments (Mantido do style.css) */
 @media (max-width: 768px) {
     .form-row {
         flex-direction: column;
@@ -814,8 +856,7 @@ textarea:focus {
     }
 }
 
-
-/* Status Badges */
+/* Status Badges (Cores ajustadas para harmonizar com o azul do style2.css) */
 .status-badge {
     padding: 4px 12px;
     border-radius: 20px;
@@ -826,37 +867,37 @@ textarea:focus {
 }
 
 .status-ativo {
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    background: #48bb78; /* Verde para ativo */
     color: white;
 }
 
 .status-inativo {
-    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    background: #a0aec0; /* Cinza para inativo */
     color: white;
 }
 
 .status-licença {
-    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    background: #ed8936; /* Laranja para licença */
     color: white;
 }
 
 .status-desligado {
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    background: #f56565; /* Vermelho para desligado */
     color: white;
 }
 
 .status-transferido {
-    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    background: #00aeef; /* Azul principal para transferido */
     color: white;
 }
 
 .status-concluído {
-    background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+    background: #805ad5; /* Roxo para concluído (mantido uma cor distinta) */
     color: white;
 }
 
-/* Empty State */
-.empty-state {
+/* Empty State (Repetição do bloco anterior, remova um se for o caso) */
+/* .empty-state {
     text-align: center;
     padding: 60px 20px;
     color: #718096;
@@ -877,9 +918,9 @@ textarea:focus {
 .empty-state p {
     font-size: 1rem;
     margin: 0;
-}
+} */
 
-/* Button Icons */
+/* Button Icons (Mantido do style.css) */
 .btn i {
     margin-right: 5px;
 }
@@ -888,35 +929,35 @@ textarea:focus {
     margin: 0;
 }
 
-/* Edit and Delete Button Colors */
+/* Edit and Delete Button Colors (Cores ajustadas para o azul do style2.css) */
 .btn-edit {
-    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    background: #00aeef; /* Azul principal */
     color: white;
 }
 
 .btn-edit:hover {
-    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    background: #008ec3; /* Azul mais escuro */
     transform: translateY(-2px);
 }
 
 .btn-delete {
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    background: #f56565; /* Mantido vermelho */
     color: white;
 }
 
 .btn-delete:hover {
-    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    background: #c53030; /* Vermelho mais escuro */
     transform: translateY(-2px);
 }
 
-/* Actions Column */
+/* Actions Column (Mantido do style.css) */
 .actions {
     display: flex;
     gap: 8px;
     justify-content: center;
 }
 
-/* Loading Overlay */
+/* Loading Overlay (Mantido do style.css, cor do spinner ajustada) */
 #loading {
     position: fixed;
     top: 0;
@@ -930,22 +971,17 @@ textarea:focus {
     z-index: 10000;
 }
 
-.loading-spinner {
+.loading-spinner { /* Classe corrigida de .spinner para .loading-spinner */
     width: 50px;
     height: 50px;
     border: 5px solid #f3f3f3;
-    border-top: 5px solid #667eea;
+    border-top: 5px solid #00aeef; /* Cor de destaque do style2.css */
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Toast Notifications */
-#toast-container {
+/* Toast Notifications (Repetição do bloco anterior, remova um se for o caso) */
+/* #toast-container {
     position: fixed;
     top: 20px;
     right: 20px;
@@ -973,41 +1009,9 @@ textarea:focus {
 
 .toast.warning {
     border-left-color: #ed8936;
-}
+} */
 
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Responsive Table */
-@media (max-width: 768px) {
-    .table-container {
-        overflow-x: auto;
-    }
-    
-    table {
-        min-width: 600px;
-    }
-    
-    .actions {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .btn {
-        font-size: 0.8rem;
-        padding: 6px 10px;
-    }
-}
-
-/* Form Validation */
+/* Form Validation (Mantido do style.css) */
 .form-group input:invalid,
 .form-group select:invalid,
 .form-group textarea:invalid {
@@ -1020,16 +1024,16 @@ textarea:focus {
     border-color: #48bb78;
 }
 
-/* Accessibility */
+/* Accessibility (Mantido do style.css, cor do outline ajustada) */
 .btn:focus,
 input:focus,
 select:focus,
 textarea:focus {
-    outline: 2px solid #667eea;
+    outline: 2px solid #00aeef; /* Cor de destaque do style2.css */
     outline-offset: 2px;
 }
 
-/* Print Styles */
+/* Print Styles (Mantido do style.css) */
 @media print {
     .btn,
     .search-container,
@@ -1053,3 +1057,57 @@ textarea:focus {
     }
 }
 
+/* --- Ignorados os estilos de login do style2.css que não se aplicam ao dashboard --- */
+/*
+.login-wrapper {}
+.logo {}
+.login-left {}
+.form-container h2 {}
+.sub {}
+.login-form {}
+.input-group {}
+.input-group:focus-within {}
+.input-group i {}
+.input-group input {}
+.toggle-password {}
+.btn-login {}
+.btn-login:hover {}
+.links {}
+.links a {}
+.links a:hover {}
+footer {}
+.login-right {}
+.login-right img {}
+*/
+
+/* Media Queries do style2.css (Aplicadas apenas se houver sobreposição e for relevante) */
+/*
+@media (max-width: 768px) {
+    .login-wrapper {
+        flex-direction: column;
+        min-height: auto;
+    }
+    .login-right {
+        display: none;
+    }
+    .login-left {
+        padding: 40px 20px;
+        width: 100%;
+    }
+    .logo {
+        margin: 0 auto 20px auto;
+    }
+}
+
+@media (max-width: 500px) {
+    .login-left {
+        padding: 30px 15px;
+    }
+    .form-container h2 {
+        font-size: 1.8rem;
+    }
+    .sub {
+        font-size: 0.9rem;
+    }
+}
+*/
